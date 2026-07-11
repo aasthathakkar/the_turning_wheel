@@ -251,15 +251,17 @@ function renderProductCard(product) {
           ${priceHtml}
         </div>
         <div class="card-actions">
-          <div class="qty-stepper" data-product-no="${product.no}">
-            <button class="qty-btn minus" type="button" aria-label="Decrease quantity">−</button>
-            <span class="qty-value">1</span>
-            <button class="qty-btn plus" type="button" aria-label="Increase quantity">+</button>
+          <div class="cart-control" data-product-no="${product.no}">
+            <button class="add-to-cart-btn" type="button" data-product-no="${product.no}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+              Add to Cart
+            </button>
+            <div class="qty-stepper cart-stepper" data-product-no="${product.no}">
+              <button class="qty-btn minus" type="button" aria-label="Decrease quantity">−</button>
+              <span class="qty-value">1</span>
+              <button class="qty-btn plus" type="button" aria-label="Increase quantity">+</button>
+            </div>
           </div>
-          <button class="add-to-cart-btn" type="button" data-product-no="${product.no}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-            Add to Cart
-          </button>
         </div>
       </div>
     </article>`;
@@ -325,15 +327,17 @@ function renderModal(product) {
       ${priceHtml}
     </div>
     <div class="modal-actions">
-      <div class="qty-stepper" data-product-no="${product.no}">
-        <button class="qty-btn minus" type="button" aria-label="Decrease quantity">−</button>
-        <span class="qty-value">1</span>
-        <button class="qty-btn plus" type="button" aria-label="Increase quantity">+</button>
+      <div class="cart-control" data-product-no="${product.no}">
+        <button class="add-to-cart-btn" type="button" data-product-no="${product.no}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+          Add to Cart
+        </button>
+        <div class="qty-stepper cart-stepper" data-product-no="${product.no}">
+          <button class="qty-btn minus" type="button" aria-label="Decrease quantity">−</button>
+          <span class="qty-value">1</span>
+          <button class="qty-btn plus" type="button" aria-label="Increase quantity">+</button>
+        </div>
       </div>
-      <button class="add-to-cart-btn" type="button" data-product-no="${product.no}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-        Add to Cart
-      </button>
     </div>
     <a href="https://wa.me/916351789012?text=${whatsappMsg}" target="_blank" rel="noopener" class="modal-whatsapp-btn">
       <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
@@ -573,6 +577,8 @@ function initModal() {
     document.body.style.overflow = 'hidden';
     // Init modal carousel only (fresh markup each time, so no bound flag yet)
     requestAnimationFrame(() => initCarousels(modalBody));
+    // Fresh markup starts in "Add to Cart" state — reflect the real cart qty if any
+    syncCartControls();
   });
   // Close modal
   function closeModal() {
@@ -823,6 +829,21 @@ function refreshCartUI() {
   const { total, hasNotePriced } = computeCartTotal();
   const totalEl = document.getElementById('cartTotalAmount');
   if (totalEl) totalEl.textContent = `₹${total}${hasNotePriced ? ' +' : ''}`;
+  syncCartControls();
+}
+// Every product card (and the modal, if open) has its own .cart-control —
+// an "Add to Cart" button and a "− qty +" stepper stacked on top of each
+// other. This walks every one currently on the page and, based on the real
+// cart data, shows the qty stepper (sliding in from the right) once that
+// product has 1+ in the cart, or the plain button again once it's back to 0.
+function syncCartControls() {
+  document.querySelectorAll('.cart-control').forEach((control) => {
+    const productNo = parseInt(control.dataset.productNo, 10);
+    const qty = cart[productNo] || 0;
+    const valueEl = control.querySelector('.cart-stepper .qty-value');
+    if (valueEl) valueEl.textContent = qty > 0 ? qty : 1;
+    control.classList.toggle('in-cart', qty > 0);
+  });
 }
 function buildWhatsappOrderMessage(name, phone, address) {
   const lines = [];
@@ -904,30 +925,30 @@ function initCart() {
     }
   });
 
-  // Quantity steppers + "Add to Cart" on product cards and inside the modal.
+  // "Add to Cart" + its live qty stepper on product cards and inside the modal.
   // Delegated on document because the modal's markup is re-created every open.
+  // The button and stepper both live inside .cart-control at all times; CSS
+  // handles the slide animation between them based on the .in-cart class —
+  // here we only ever touch the real cart data, then let syncCartControls()
+  // (called from refreshCartUI) update every matching control on the page.
   document.addEventListener('click', (e) => {
-    if (e.target.closest('.cart-item')) return; // handled above
-    const qtyBtn = e.target.closest('.qty-btn');
-    if (qtyBtn) {
+    if (e.target.closest('.cart-item')) return; // handled above, in the drawer
+    const stepperBtn = e.target.closest('.cart-control .qty-btn');
+    if (stepperBtn) {
       e.stopPropagation();
-      const stepper = qtyBtn.closest('.qty-stepper');
-      const valueEl = stepper.querySelector('.qty-value');
-      let val = parseInt(valueEl.textContent, 10) || 1;
-      val = qtyBtn.classList.contains('plus') ? val + 1 : Math.max(1, val - 1);
-      valueEl.textContent = val;
+      const control = stepperBtn.closest('.cart-control');
+      const productNo = parseInt(control.dataset.productNo, 10);
+      const current = cart[productNo] || 0;
+      const next = stepperBtn.classList.contains('plus') ? current + 1 : current - 1;
+      updateCartQty(productNo, next);
       return;
     }
     const addBtn = e.target.closest('.add-to-cart-btn');
     if (addBtn) {
       e.stopPropagation();
       const productNo = parseInt(addBtn.dataset.productNo, 10);
-      const container = addBtn.closest('.card-actions, .modal-actions');
-      const qtyEl = container ? container.querySelector('.qty-value') : null;
-      const qty = qtyEl ? parseInt(qtyEl.textContent, 10) || 1 : 1;
-      addToCart(productNo, qty);
-      if (qtyEl) qtyEl.textContent = '1';
-      showToast(`Added ${qty} × Product #${productNo} to cart`);
+      addToCart(productNo, 1);
+      showToast(`Added Product #${productNo} to cart`);
     }
   });
 

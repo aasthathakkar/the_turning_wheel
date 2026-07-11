@@ -867,12 +867,45 @@ ul { list-style: none; }
   padding: 4px 12px;
   border-radius: var(--radius-full);
 }
-/* Cart controls: quantity stepper + Add to Cart */
+/* Cart controls: "Add to Cart" that morphs into a live − qty + stepper */
 .card-actions {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
   margin-top: var(--space-md);
+}
+/* .cart-control stacks the button and the stepper in the same grid cell so
+   the row never jumps size, then slides/fades between them with the
+   .in-cart class — the button exits to the left, the stepper enters from
+   the right, like it's sliding out from behind the button. */
+.cart-control {
+  position: relative;
+  flex: 1;
+  display: grid;
+}
+.cart-control .add-to-cart-btn,
+.cart-control .cart-stepper {
+  grid-area: 1 / 1;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+}
+.cart-control .add-to-cart-btn {
+  transform: translateX(0);
+  opacity: 1;
+}
+.cart-control .cart-stepper {
+  transform: translateX(28px);
+  opacity: 0;
+  pointer-events: none;
+}
+.cart-control.in-cart .add-to-cart-btn {
+  transform: translateX(-28px);
+  opacity: 0;
+  pointer-events: none;
+}
+.cart-control.in-cart .cart-stepper {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
 }
 .qty-stepper {
   display: flex;
@@ -881,6 +914,13 @@ ul { list-style: none; }
   border-radius: var(--radius-full);
   overflow: hidden;
   flex-shrink: 0;
+}
+/* The live in-cart stepper fills the same footprint as the Add to Cart
+   button it replaces, instead of sitting compact/left-aligned. */
+.cart-stepper {
+  width: 100%;
+  justify-content: space-between;
+  background: var(--card-bg, #fff);
 }
 .qty-btn {
   width: 30px;
@@ -893,6 +933,11 @@ ul { list-style: none; }
   color: var(--navy);
   transition: background var(--duration-fast) var(--ease-out);
 }
+.cart-stepper .qty-btn {
+  width: 36px;
+  height: 36px;
+  font-size: 17px;
+}
 .qty-btn:hover { background: rgba(14, 27, 44, 0.06); }
 .qty-value {
   min-width: 22px;
@@ -901,8 +946,9 @@ ul { list-style: none; }
   font-weight: 600;
   color: var(--navy);
 }
+.cart-stepper .qty-value { font-size: 14px; }
 .add-to-cart-btn {
-  flex: 1;
+  width: 100%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -914,9 +960,8 @@ ul { list-style: none; }
   font-size: 12.5px;
   font-weight: 600;
   letter-spacing: 0.3px;
-  transition: transform var(--duration-fast) var(--ease-spring), box-shadow var(--duration-fast) var(--ease-out);
 }
-.add-to-cart-btn:hover {
+.cart-control:not(.in-cart) .add-to-cart-btn:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
@@ -929,9 +974,16 @@ ul { list-style: none; }
   margin-bottom: var(--space-md);
 }
 .modal-actions .add-to-cart-btn {
-  flex: 1;
   padding: 12px 20px;
   font-size: 13.5px;
+}
+.modal-actions .cart-stepper .qty-btn {
+  width: 42px;
+  height: 42px;
+  font-size: 19px;
+}
+.modal-actions .cart-stepper .qty-value {
+  font-size: 15px;
 }
 .modal-whatsapp-btn {
   margin-top: var(--space-xs);

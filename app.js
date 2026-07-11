@@ -199,6 +199,9 @@ function renderProductCard(product) {
         <img src="images/${product.no}/${i + 1}.jpg" alt="${product.title} — photo ${i + 1}" class="product-photo" loading="lazy"
              onload="this.closest('.carousel-slide').classList.add('has-photo')"
              onerror="this.style.display='none'">
+        <button class="photo-zoom-btn" type="button" aria-label="View full image" data-product-no="${product.no}" data-index="${i}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path><path d="M11 8v6"></path><path d="M8 11h6"></path></svg>
+        </button>
         <span class="slide-indicator">${i + 1} / ${product.imageCount}</span>
         <div class="placeholder-label">Product ${product.no} — Image ${i + 1}</div>
         <div class="placeholder-sub">Drag your product photo here</div>
@@ -283,6 +286,9 @@ function renderModal(product) {
         <img src="images/${product.no}/${i + 1}.jpg" alt="${product.title} — photo ${i + 1}" class="product-photo" loading="lazy"
              onload="this.closest('.carousel-slide').classList.add('has-photo')"
              onerror="this.style.display='none'">
+        <button class="photo-zoom-btn" type="button" aria-label="View full image" data-product-no="${product.no}" data-index="${i}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path><path d="M11 8v6"></path><path d="M8 11h6"></path></svg>
+        </button>
         <span class="slide-indicator">${i + 1} / ${product.imageCount}</span>
         <div class="placeholder-label">Product ${product.no} — Image ${i + 1}</div>
         <div class="placeholder-sub">High resolution product photo</div>
@@ -572,8 +578,8 @@ function initModal() {
   document.getElementById('productsGrid').addEventListener('click', (e) => {
     const card = e.target.closest('.product-card');
     if (!card) return;
-    // Don't open modal if clicking carousel nav, dots, or the cart controls
-    if (e.target.closest('.carousel-nav') || e.target.closest('.carousel-dot') || e.target.closest('.card-actions')) return;
+    // Don't open modal if clicking carousel nav, dots, the zoom button, or the cart controls
+    if (e.target.closest('.carousel-nav') || e.target.closest('.carousel-dot') || e.target.closest('.photo-zoom-btn') || e.target.closest('.card-actions')) return;
     const productNo = parseInt(card.dataset.product);
     const product = PRODUCTS.find((p) => p.no === productNo);
     if (!product) return;
@@ -595,9 +601,249 @@ function initModal() {
     if (e.target === modal) closeModal();
   });
   document.addEventListener('keydown', (e) => {
+    // If the lightbox is open on top of the modal, Escape should close only
+    // the lightbox (handled in initLightbox) — not the modal underneath it.
+    if (document.getElementById('lightboxOverlay').classList.contains('active')) return;
     if (e.key === 'Escape' && modal.classList.contains('active')) {
       closeModal();
     }
+  });
+}
+// ── Image Lightbox ──
+// Full-screen viewer for product photos. Card and modal photos are shown
+// cropped to fill their frames (object-fit: cover), so this is where the
+// complete, uncropped image can be inspected: scroll or pinch to zoom,
+// drag to pan, double-click / double-tap to toggle zoom, and arrow keys,
+// buttons, or a swipe to move between a product's photos.
+function initLightbox() {
+  const overlay = document.getElementById('lightboxOverlay');
+  const stage = document.getElementById('lightboxStage');
+  const img = document.getElementById('lightboxImg');
+  const closeBtn = document.getElementById('lightboxClose');
+  const prevBtn = document.getElementById('lightboxPrev');
+  const nextBtn = document.getElementById('lightboxNext');
+  const counter = document.getElementById('lightboxCounter');
+  const productModal = document.getElementById('productModal');
+  const cartOverlay = document.getElementById('cartOverlay');
+
+  const MAX_SCALE = 5;
+  let photos = [];
+  let index = 0;
+  let scale = 1;
+  let tx = 0;
+  let ty = 0;
+
+  function applyTransform() {
+    img.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+    img.classList.toggle('zoomed', scale > 1.001);
+  }
+  // Keep the (zoomed) image from being dragged fully out of view
+  function clampPan() {
+    const maxTx = Math.max(0, (img.offsetWidth * scale - stage.clientWidth) / 2);
+    const maxTy = Math.max(0, (img.offsetHeight * scale - stage.clientHeight) / 2);
+    tx = Math.min(maxTx, Math.max(-maxTx, tx));
+    ty = Math.min(maxTy, Math.max(-maxTy, ty));
+  }
+  function resetZoom() {
+    scale = 1;
+    tx = 0;
+    ty = 0;
+    applyTransform();
+  }
+  // Zoom towards a specific screen point (cursor, tap, or pinch midpoint)
+  // so the spot the person is looking at stays put while the image scales.
+  function zoomAt(clientX, clientY, targetScale) {
+    const rect = stage.getBoundingClientRect();
+    const next = Math.min(MAX_SCALE, Math.max(1, targetScale));
+    const vx = clientX - (rect.left + rect.width / 2) - tx;
+    const vy = clientY - (rect.top + rect.height / 2) - ty;
+    tx += vx * (1 - next / scale);
+    ty += vy * (1 - next / scale);
+    scale = next;
+    if (scale <= 1.001) {
+      tx = 0;
+      ty = 0;
+    }
+    clampPan();
+    applyTransform();
+  }
+  function showPhoto(i) {
+    index = (i + photos.length) % photos.length;
+    img.src = photos[index];
+    resetZoom();
+    counter.textContent = `${index + 1} / ${photos.length}`;
+    const single = photos.length <= 1;
+    prevBtn.hidden = single;
+    nextBtn.hidden = single;
+    counter.hidden = single;
+  }
+  function openLightbox(productNo, photoIndex) {
+    const product = PRODUCTS.find((p) => p.no === Number(productNo));
+    if (!product) return;
+    photos = Array.from({ length: product.imageCount }, (_, n) => `images/${product.no}/${n + 1}.jpg`);
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    showPhoto(photoIndex || 0);
+  }
+  function closeLightbox() {
+    overlay.classList.remove('active');
+    // The lightbox can sit on top of the product modal (or the cart) — if one
+    // of those is still open underneath, the page scroll stays locked for it.
+    const stillLocked =
+      productModal.classList.contains('active') || cartOverlay.classList.contains('active');
+    document.body.style.overflow = stillLocked ? 'hidden' : '';
+  }
+
+  // Open from the zoom button on any slide (product cards + modal)…
+  document.addEventListener('click', (e) => {
+    const zoomBtn = e.target.closest('.photo-zoom-btn');
+    if (zoomBtn) {
+      openLightbox(zoomBtn.dataset.productNo, parseInt(zoomBtn.dataset.index, 10) || 0);
+      return;
+    }
+    // …or by tapping the big photo itself inside the product modal
+    const modalPhoto = e.target.closest('.modal-carousel .product-photo');
+    if (modalPhoto) {
+      const slide = modalPhoto.closest('.carousel-slide');
+      const track = slide.parentElement;
+      const idx = Array.prototype.indexOf.call(track.children, slide);
+      const productNo = String(track.dataset.productNo || '').replace('modal-', '');
+      openLightbox(productNo, Math.max(0, idx));
+    }
+  });
+
+  closeBtn.addEventListener('click', closeLightbox);
+  prevBtn.addEventListener('click', () => showPhoto(index - 1));
+  nextBtn.addEventListener('click', () => showPhoto(index + 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (!overlay.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowLeft') showPhoto(index - 1);
+    else if (e.key === 'ArrowRight') showPhoto(index + 1);
+  });
+
+  // Scroll wheel / trackpad zoom, anchored at the cursor
+  stage.addEventListener(
+    'wheel',
+    (e) => {
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.18 : 1 / 1.18;
+      zoomAt(e.clientX, e.clientY, scale * factor);
+    },
+    { passive: false }
+  );
+
+  // Double-click (mouse) toggles zoom; double-tap (touch) is handled below.
+  let lastTouchToggle = 0;
+  img.addEventListener('dblclick', (e) => {
+    e.preventDefault();
+    if (Date.now() - lastTouchToggle < 500) return; // already handled as a double-tap
+    zoomAt(e.clientX, e.clientY, scale > 1.001 ? 1 : 2.5);
+  });
+
+  // Pointer handling: one finger drags to pan (zoomed) or swipes between
+  // photos (not zoomed); two fingers pinch-zoom and pan together.
+  const pointers = new Map();
+  let pinchStartDist = 0;
+  let pinchStartScale = 1;
+  let lastMid = null;
+  let panStart = null;
+  let movedSincePress = false;
+  let lastTap = 0;
+
+  function pointerDist() {
+    const [a, b] = [...pointers.values()];
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  }
+  function pointerMid() {
+    const [a, b] = [...pointers.values()];
+    return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+  }
+
+  stage.addEventListener('pointerdown', (e) => {
+    stage.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, startX: e.clientX, startY: e.clientY });
+    movedSincePress = false;
+    img.classList.add('dragging'); // no transition while a finger is down — keeps pan/pinch crisp
+    if (pointers.size === 1) {
+      panStart = { x: e.clientX, y: e.clientY, tx, ty };
+    } else if (pointers.size === 2) {
+      pinchStartDist = pointerDist();
+      pinchStartScale = scale;
+      lastMid = pointerMid();
+      panStart = null;
+    }
+  });
+
+  stage.addEventListener('pointermove', (e) => {
+    const p = pointers.get(e.pointerId);
+    if (!p) return;
+    p.x = e.clientX;
+    p.y = e.clientY;
+    if (Math.hypot(e.clientX - p.startX, e.clientY - p.startY) > 8) movedSincePress = true;
+
+    if (pointers.size === 2 && pinchStartDist > 0) {
+      const mid = pointerMid();
+      if (lastMid) {
+        tx += mid.x - lastMid.x;
+        ty += mid.y - lastMid.y;
+      }
+      zoomAt(mid.x, mid.y, pinchStartScale * (pointerDist() / pinchStartDist));
+      lastMid = mid;
+    } else if (pointers.size === 1 && panStart && scale > 1.001) {
+      tx = panStart.tx + (e.clientX - panStart.x);
+      ty = panStart.ty + (e.clientY - panStart.y);
+      clampPan();
+      applyTransform();
+    }
+  });
+
+  function endPointer(e) {
+    const p = pointers.get(e.pointerId);
+    pointers.delete(e.pointerId);
+    if (pointers.size === 0) {
+      img.classList.remove('dragging');
+      if (p && scale <= 1.001) {
+        const dx = e.clientX - p.startX;
+        const dy = e.clientY - p.startY;
+        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5 && photos.length > 1) {
+          // horizontal swipe between photos when not zoomed in
+          showPhoto(index + (dx < 0 ? 1 : -1));
+        } else if (e.pointerType === 'touch' && !movedSincePress) {
+          // double-tap toggles zoom on touch devices
+          const now = Date.now();
+          if (now - lastTap < 320) {
+            lastTouchToggle = now;
+            zoomAt(e.clientX, e.clientY, scale > 1.001 ? 1 : 2.5);
+            lastTap = 0;
+          } else {
+            lastTap = now;
+          }
+        }
+      }
+      panStart = null;
+      pinchStartDist = 0;
+      lastMid = null;
+    } else if (pointers.size === 1) {
+      // pinch ended with one finger still down — restart the pan from here
+      const rem = [...pointers.values()][0];
+      panStart = { x: rem.x, y: rem.y, tx, ty };
+      pinchStartDist = 0;
+      lastMid = null;
+    }
+  }
+  stage.addEventListener('pointerup', endPointer);
+  stage.addEventListener('pointercancel', endPointer);
+
+  // Click on the dark backdrop closes — but not if that click was really the
+  // end of a pan/swipe gesture that happened to release over the backdrop.
+  overlay.addEventListener('click', (e) => {
+    if (movedSincePress) {
+      movedSincePress = false;
+      return;
+    }
+    if (e.target === overlay || e.target === stage) closeLightbox();
   });
 }
 // ── Navigation ──

@@ -69,9 +69,10 @@ const PRODUCTS = [
     section: "Serveware",
     category: "serveware",
     title: "Mandala Ceramic Snack Plates (Blue & Yellow) | Square Dessert Plates with Handle (8.6 Inch)",
-    platform: "Amazon",
-    listPrice: 569,
+    platform: "Nestasia",
+    listPrice: 490,
     ourPriceNote: "₹399 (1 piece) / ₹699 (2 piece)",
+    ourPriceSingle: 399,
     imageCount: 3,
   },
   {
@@ -185,8 +186,9 @@ const CATEGORY_COLORS = {
 };
 // ── Render product card HTML ──
 function renderProductCard(product) {
-  const savePercent = product.ourPrice
-    ? Math.round((1 - product.ourPrice / product.listPrice) * 100)
+  const saveBase = product.ourPrice || product.ourPriceSingle;
+  const savePercent = saveBase
+    ? Math.round((1 - saveBase / product.listPrice) * 100)
     : null;
   const colors = CATEGORY_COLORS[product.category];
   // Generate carousel slides
@@ -214,7 +216,8 @@ function renderProductCard(product) {
       <div class="price-our">
         <span class="price-our-label">Our Price</span>
         <span class="price-our-amount multi-price">${product.ourPriceNote}</span>
-      </div>`;
+      </div>${savePercent ? `
+      <span class="save-tag">SAVE ${savePercent}%</span>` : ''}`;
   } else {
     priceHtml = `
       <div class="price-our">
@@ -268,8 +271,9 @@ function renderProductCard(product) {
 }
 // ── Render modal HTML ──
 function renderModal(product) {
-  const savePercent = product.ourPrice
-    ? Math.round((1 - product.ourPrice / product.listPrice) * 100)
+  const saveBase = product.ourPrice || product.ourPriceSingle;
+  const savePercent = saveBase
+    ? Math.round((1 - saveBase / product.listPrice) * 100)
     : null;
   const colors = CATEGORY_COLORS[product.category];
   let slides = '';
@@ -294,7 +298,8 @@ function renderModal(product) {
       <div class="price-our">
         <span class="price-our-label">Our Price</span>
         <span class="price-our-amount multi-price">${product.ourPriceNote}</span>
-      </div>`;
+      </div>${savePercent ? `
+      <span class="save-tag">SAVE ${savePercent}%</span>` : ''}`;
   } else {
     priceHtml = `
       <div class="price-our">

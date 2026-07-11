@@ -15,7 +15,9 @@
   <nav class="nav" id="nav">
     <div class="nav-inner">
       <a href="#hero" class="nav-logo">
-        <div class="nav-logo-icon">TW</div>
+        <div class="nav-logo-icon">
+          <img src="l2.png" alt="The Turning Wheel logo">
+        </div>
         <span class="nav-logo-text">The Turning Wheel</span>
       </a>
       <div class="nav-right">
@@ -45,17 +47,21 @@
     <div class="hero-content">
       <div class="hero-badge">Premium Collection 2026</div>
       <div class="hero-logo-circle">
-        <span>TW</span>
+        <img src="l2.png" alt="The Turning Wheel logo">
+      </div>
+      <div class="hero-eyebrow">
+        <span class="eyebrow-line"></span>
+        <span class="eyebrow-text">The</span>
+        <span class="eyebrow-line"></span>
       </div>
       <h1 class="hero-title">
-        <span class="hero-title-line">The Turning</span>
-        <span class="hero-title-line accent">Wheel</span>
+        <span class="hero-title-line">Turning Wh<span class="accent-white">ee</span>l</span>
       </h1>
       <p class="hero-tagline">Crafting Change, One Piece at a Time</p>
       <p class="hero-sub">Premium Imported Crockery & Kitchenware — Below Amazon Prices</p>
       <div class="hero-actions">
         <a href="#catalog" class="btn btn-primary">Browse Catalog</a>
-        <a href="#order" class="btn btn-outline">Order on WhatsApp</a>
+        <a href="#order" class="btn btn-outline js-open-cart">Order on WhatsApp</a>
       </div>
       <div class="hero-stats">
         <div class="hero-stat">
@@ -194,7 +200,9 @@
     <div class="container">
       <div class="footer-content">
         <div class="footer-brand">
-          <div class="footer-logo-circle">TW</div>
+          <div class="footer-logo-circle">
+            <img src="l2.png" alt="The Turning Wheel logo">
+          </div>
           <h3>The Turning Wheel</h3>
           <p>Crafting Change, One Piece at a Time</p>
         </div>
@@ -247,6 +255,17 @@
   </div>
   <!-- ═══════════════ CART TOAST ═══════════════ -->
   <div class="cart-toast" id="cartToast"></div>
+  <!-- ═══════════════ IMAGE LIGHTBOX ═══════════════ -->
+  <div class="lightbox-overlay" id="lightboxOverlay">
+    <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close">&times;</button>
+    <button class="lightbox-nav prev" id="lightboxPrev" type="button" aria-label="Previous image">‹</button>
+    <button class="lightbox-nav next" id="lightboxNext" type="button" aria-label="Next image">›</button>
+    <div class="lightbox-stage" id="lightboxStage">
+      <img class="lightbox-img" id="lightboxImg" src="" alt="">
+    </div>
+    <div class="lightbox-counter" id="lightboxCounter"></div>
+    <div class="lightbox-hint" id="lightboxHint">Scroll or pinch to zoom · drag to pan</div>
+  </div>
   <script src="app.js"></script>
 </body>
 </html>

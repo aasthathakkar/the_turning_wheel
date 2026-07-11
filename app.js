@@ -702,6 +702,7 @@ function initCategoryNavLinks() {
 // ── Smooth scroll for anchor links ──
 function initSmoothScroll() {
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    if (anchor.classList.contains('js-open-cart')) return; // opens the cart drawer instead — wired in initCart()
     anchor.addEventListener('click', (e) => {
       const targetId = anchor.getAttribute('href');
       if (targetId === '#') return;
@@ -904,6 +905,13 @@ function initCart() {
   }
   openBtn.addEventListener('click', openCart);
   closeBtn.addEventListener('click', closeCart);
+  // "Order on WhatsApp" (hero) opens the cart drawer instead of scrolling to the order section
+  document.querySelectorAll('.js-open-cart').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      openCart();
+    });
+  });
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) closeCart();
   });

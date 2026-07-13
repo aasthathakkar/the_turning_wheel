@@ -1,3 +1,10 @@
+document.addEventListener('DOMContentLoaded', async () => {
+    // ... your other initializers
+    initCart();
+    
+    // Initialize Vercel Analytics here
+    inject(); 
+});
 /* ════════════════════════════════════════════════════
    THE TURNING WHEEL — Application Logic
    Premium Imported Crockery & Kitchenware Catalog

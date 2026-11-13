@@ -1243,6 +1243,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initCarousels();
   initFilters();
   initModal();
+  initLightbox();
   initNav();
   initParticles();
   initCounters();
